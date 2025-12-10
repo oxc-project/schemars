@@ -13,6 +13,12 @@ dependencies = [
 
 [[package]]
 name = "arrayvec"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
+
+[[package]]
+name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
@@ -275,7 +281,8 @@ checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
 name = "oxc-schemars"
 version = "0.8.27"
 dependencies = [
- "arrayvec",
+ "arrayvec 0.5.2",
+ "arrayvec 0.7.6",
  "bigdecimal",
  "bytes",
  "chrono",
@@ -379,7 +386,7 @@ version = "1.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4c4216490d5a413bc6d10fa4742bd7d4955941d062c0ef873141d6b0e7b30fd"
 dependencies = [
- "arrayvec",
+ "arrayvec 0.7.6",
  "num-traits",
 ]
 
