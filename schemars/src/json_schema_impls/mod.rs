@@ -70,6 +70,8 @@ mod maps;
 mod nonzero_signed;
 mod nonzero_unsigned;
 mod primitives;
+#[cfg(feature = "regex")]
+mod regex;
 #[cfg(feature = "semver")]
 mod semver;
 mod sequences;
@@ -87,5 +89,3 @@ mod uuid08;
 #[cfg(feature = "uuid1")]
 mod uuid1;
 mod wrapper;
-#[cfg(feature = "regex")]
-mod regex;
