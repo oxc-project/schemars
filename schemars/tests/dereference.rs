@@ -12,7 +12,10 @@ struct Struct {
 fn dereference_struct() {
     let mut generator = SchemaGenerator::default();
     let struct_ref_schema = generator.subschema_for::<Struct>();
-    let struct_schema = generator.definitions().get(&<Struct>::schema_name()).unwrap();
+    let struct_schema = generator
+        .definitions()
+        .get(&<Struct>::schema_name())
+        .unwrap();
 
     assert!(struct_ref_schema.is_ref());
     assert!(!struct_schema.is_ref());
