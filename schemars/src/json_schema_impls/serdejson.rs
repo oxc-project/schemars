@@ -42,6 +42,3 @@ impl JsonSchema for Number {
         .into()
     }
 }
-
-#[cfg(feature = "raw_value")]
-forward_impl!(serde_json::value::RawValue => Value);
