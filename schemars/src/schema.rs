@@ -2,10 +2,6 @@
 JSON Schema types.
 */
 
-#[cfg(feature = "impl_json_schema")]
-use crate as schemars;
-#[cfg(feature = "impl_json_schema")]
-use crate::JsonSchema;
 use crate::{Map, Set};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -14,7 +10,6 @@ use std::ops::Deref;
 /// A JSON Schema.
 #[allow(clippy::large_enum_variant)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(untagged)]
 pub enum Schema {
     /// A trivial boolean JSON Schema.
@@ -87,7 +82,6 @@ impl From<bool> for Schema {
 
 /// The root object of a JSON Schema document.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct RootSchema {
     /// The `$schema` keyword.
@@ -111,7 +105,6 @@ pub struct RootSchema {
 
 /// A JSON Schema object.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct SchemaObject {
     /// Properties which annotate the [`SchemaObject`] which typically have no effect when an object is being validated against the schema.
@@ -258,7 +251,6 @@ impl From<Schema> for SchemaObject {
 
 /// Properties which annotate a [`SchemaObject`] which typically have no effect when an object is being validated against the schema.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct Metadata {
     /// The `$id` keyword.
@@ -313,7 +305,6 @@ fn is_false(b: &bool) -> bool {
 
 /// Properties of a [`SchemaObject`] which define validation assertions in terms of other schemas.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct SubschemaValidation {
     /// The `allOf` keyword.
@@ -355,7 +346,6 @@ pub struct SubschemaValidation {
 
 /// Properties of a [`SchemaObject`] which define validation assertions for numbers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct NumberValidation {
     /// The `multipleOf` keyword.
@@ -387,7 +377,6 @@ pub struct NumberValidation {
 
 /// Properties of a [`SchemaObject`] which define validation assertions for strings.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct StringValidation {
     /// The `maxLength` keyword.
@@ -409,7 +398,6 @@ pub struct StringValidation {
 
 /// Properties of a [`SchemaObject`] which define validation assertions for arrays.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct ArrayValidation {
     /// The `items` keyword.
@@ -446,7 +434,6 @@ pub struct ArrayValidation {
 
 /// Properties of a [`SchemaObject`] which define validation assertions for objects.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", default)]
 pub struct ObjectValidation {
     /// The `maxProperties` keyword.
@@ -490,7 +477,6 @@ pub struct ObjectValidation {
 ///
 /// See [JSON Schema 4.2.1. Instance Data Model](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-4.2.1).
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase")]
 pub enum InstanceType {
     Null,
@@ -506,7 +492,6 @@ pub enum InstanceType {
 ///
 /// In some contexts, a `Single` may be semantically distinct from a `Vec` containing only item.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
 #[serde(untagged)]
 pub enum SingleOrVec<T> {
     Single(Box<T>),
