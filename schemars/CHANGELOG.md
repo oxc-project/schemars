@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.8.27...oxc-schemars-v0.9.0) - 2026-05-09
+
+### Other
+
+- trim features and deps to only those required by oxc ([#37](https://github.com/oxc-project/schemars/pull/37))
+- *(deps)* update dependency rust to v1.95.0 ([#30](https://github.com/oxc-project/schemars/pull/30))
+- *(deps)* update rust crates ([#4](https://github.com/oxc-project/schemars/pull/4))
+- add security analysis workflow ([#31](https://github.com/oxc-project/schemars/pull/31))
+
 ## [0.8.27](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.8.26...oxc-schemars-v0.8.27) - 2025-11-23
 
 ### Fixed
