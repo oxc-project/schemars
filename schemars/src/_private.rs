@@ -163,6 +163,28 @@ pub mod metadata {
     add_metadata_fn!(add_write_only, write_only, bool);
     add_metadata_fn!(add_default, default, Option<Value>);
 
+    pub fn add_description_to_additional_properties(
+        schema: Schema,
+        description: impl Into<String>,
+    ) -> Schema {
+        let description = description.into();
+        if description.is_empty() {
+            return schema;
+        }
+
+        let mut schema_obj = schema.into_object();
+        if let Some(object) = &mut schema_obj.object {
+            if let Some(additional_properties) = &mut object.additional_properties {
+                let schema = std::mem::replace(additional_properties.as_mut(), true.into());
+                let mut additional_properties_obj = schema.into_object();
+                additional_properties_obj.metadata().description = Some(description);
+                **additional_properties = Schema::Object(additional_properties_obj);
+            }
+        }
+
+        Schema::Object(schema_obj)
+    }
+
     pub fn add_examples<I: IntoIterator<Item = Value>>(schema: Schema, examples: I) -> Schema {
         let mut schema_obj = schema.into_object();
         schema_obj.metadata().examples.extend(examples);
