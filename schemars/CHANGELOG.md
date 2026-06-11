@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.9.0...oxc-schemars-v0.9.1) - 2026-06-11
+
+### Fixed
+
+- *(schemars)* preserve flattened map schemas ([#45](https://github.com/oxc-project/schemars/pull/45))
+
 ## [0.9.0](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.8.27...oxc-schemars-v0.9.0) - 2026-05-09
 
 ### Other
