@@ -45,6 +45,8 @@ impl Merge for Option<Box<Schema>> {
             // Perfer permissive schemas.
             (Some(Schema::Bool(true)), _) => Some(Box::new(true.into())),
             (_, Some(Schema::Bool(true))) => Some(Box::new(true.into())),
+            (None, Some(s @ Schema::Object(_))) => Some(Box::new(s)),
+            (Some(s @ Schema::Object(_)), None) => Some(Box::new(s)),
             (None, _) => None,
             (_, None) => None,
 
