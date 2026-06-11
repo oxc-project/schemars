@@ -1,5 +1,6 @@
 mod util;
 use schemars::JsonSchema;
+use std::collections::BTreeMap;
 use util::*;
 
 #[allow(dead_code)]
@@ -46,6 +47,27 @@ struct Deep4 {
     os: &'static str,
 }
 
+#[allow(dead_code)]
+#[derive(JsonSchema)]
+struct FlattenedMap {
+    #[serde(flatten)]
+    extra: BTreeMap<String, Vec<String>>,
+}
+
+#[allow(dead_code)]
+#[derive(JsonSchema)]
+#[serde(deny_unknown_fields)]
+struct DenyUnknownFields {
+    value: String,
+}
+
+#[allow(dead_code)]
+#[derive(JsonSchema)]
+struct FlattenedDenyUnknownFields {
+    #[serde(flatten)]
+    extra: DenyUnknownFields,
+}
+
 #[test]
 fn test_flat_schema() -> TestResult {
     test_default_generated_schema::<Flat>("flatten")
@@ -54,4 +76,14 @@ fn test_flat_schema() -> TestResult {
 #[test]
 fn test_flattened_schema() -> TestResult {
     test_default_generated_schema::<Deep1>("flatten")
+}
+
+#[test]
+fn test_flattened_map_schema() -> TestResult {
+    test_default_generated_schema::<FlattenedMap>("flatten_map")
+}
+
+#[test]
+fn test_flattened_deny_unknown_fields_schema() -> TestResult {
+    test_default_generated_schema::<FlattenedDenyUnknownFields>("flatten_deny_unknown_fields")
 }
