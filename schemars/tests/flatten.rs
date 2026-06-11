@@ -1,6 +1,8 @@
-mod util;
-use schemars::JsonSchema;
 use std::collections::BTreeMap;
+
+use schemars::JsonSchema;
+
+mod util;
 use util::*;
 
 #[allow(dead_code)]
