@@ -3,6 +3,9 @@ use std::env;
 // Based on https://github.com/serde-rs/serde/blob/master/serde/build.rs
 
 fn main() {
+    println!("cargo:rustc-check-cfg=cfg(std_atomic)");
+    println!("cargo:rustc-check-cfg=cfg(std_atomic64)");
+
     let target = env::var("TARGET").unwrap();
     let emscripten = target == "asmjs-unknown-emscripten" || target == "wasm32-unknown-emscripten";
 

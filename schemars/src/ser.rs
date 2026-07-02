@@ -77,9 +77,9 @@ impl<'a> serde::Serializer for Serializer<'a> {
     forward_to_subschema_for!(serialize_str, &str);
     forward_to_subschema_for!(serialize_bytes, &[u8]);
 
-    fn collect_str<T: ?Sized>(self, _value: &T) -> Result<Self::Ok, Self::Error>
+    fn collect_str<T>(self, _value: &T) -> Result<Self::Ok, Self::Error>
     where
-        T: Display,
+        T: ?Sized + Display,
     {
         Ok(self.generator.subschema_for::<&str>())
     }
@@ -128,9 +128,9 @@ impl<'a> serde::Serializer for Serializer<'a> {
         self.serialize_none()
     }
 
-    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok, Self::Error>
+    fn serialize_some<T>(self, value: &T) -> Result<Self::Ok, Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         // FIXME nasty duplication of `impl JsonSchema for Option<T>`
         fn add_null_type(instance_type: &mut SingleOrVec<InstanceType>) {
@@ -196,13 +196,13 @@ impl<'a> serde::Serializer for Serializer<'a> {
         Ok(Schema::Bool(true))
     }
 
-    fn serialize_newtype_struct<T: ?Sized>(
+    fn serialize_newtype_struct<T>(
         self,
         name: &'static str,
         value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         let include_title = self.include_title;
         let mut result = value.serialize(self);
@@ -216,7 +216,7 @@ impl<'a> serde::Serializer for Serializer<'a> {
         result
     }
 
-    fn serialize_newtype_variant<T: ?Sized>(
+    fn serialize_newtype_variant<T>(
         self,
         _name: &'static str,
         _variant_index: u32,
@@ -224,7 +224,7 @@ impl<'a> serde::Serializer for Serializer<'a> {
         _value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         Ok(Schema::Bool(true))
     }
@@ -305,9 +305,9 @@ impl serde::ser::SerializeTupleVariant for Serializer<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, _value: &T) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         Ok(())
     }
@@ -321,13 +321,9 @@ impl serde::ser::SerializeStructVariant for Serializer<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(
-        &mut self,
-        _key: &'static str,
-        _value: &T,
-    ) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, _key: &'static str, _value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         Ok(())
     }
@@ -341,9 +337,9 @@ impl serde::ser::SerializeSeq for SerializeSeq<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    fn serialize_element<T>(&mut self, value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         if self.items != Some(Schema::Bool(true)) {
             let schema = value.serialize(Serializer {
@@ -381,9 +377,9 @@ impl serde::ser::SerializeTuple for SerializeTuple<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    fn serialize_element<T>(&mut self, value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         let schema = value.serialize(Serializer {
             generator: self.generator,
@@ -418,9 +414,9 @@ impl serde::ser::SerializeTupleStruct for SerializeTuple<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         serde::ser::SerializeTuple::serialize_element(self, value)
     }
@@ -434,9 +430,9 @@ impl serde::ser::SerializeMap for SerializeMap<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_key<T: ?Sized>(&mut self, key: &T) -> Result<(), Self::Error>
+    fn serialize_key<T>(&mut self, key: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         // FIXME this is too lenient - we should return an error if serde_json
         // doesn't allow T to be a key of a map.
@@ -450,9 +446,9 @@ impl serde::ser::SerializeMap for SerializeMap<'_> {
         Ok(())
     }
 
-    fn serialize_value<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    fn serialize_value<T>(&mut self, value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         let key = self.current_key.take().unwrap_or_default();
         let schema = value.serialize(Serializer {
@@ -486,13 +482,9 @@ impl serde::ser::SerializeStruct for SerializeMap<'_> {
     type Ok = Schema;
     type Error = Error;
 
-    fn serialize_field<T: ?Sized>(
-        &mut self,
-        key: &'static str,
-        value: &T,
-    ) -> Result<(), Self::Error>
+    fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<(), Self::Error>
     where
-        T: serde::Serialize,
+        T: ?Sized + serde::Serialize,
     {
         let prop_schema = value.serialize(Serializer {
             generator: self.generator,
