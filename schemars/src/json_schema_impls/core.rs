@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use serde_json::json;
 use std::borrow::Cow;
 use std::ops::{Bound, Range, RangeInclusive};
@@ -23,8 +23,7 @@ impl<T: JsonSchema> JsonSchema for Option<T> {
                 Schema::Bool(true) => Schema::Bool(true),
                 Schema::Bool(false) => <()>::json_schema(generator),
                 Schema::Object(SchemaObject {
-                    instance_type: Some(ref mut instance_type),
-                    ..
+                    instance_type: Some(ref mut instance_type), ..
                 }) => {
                     add_null_type(instance_type);
                     schema
@@ -42,9 +41,7 @@ impl<T: JsonSchema> JsonSchema for Option<T> {
         }
         if generator.settings().option_nullable {
             let mut schema_obj = schema.into_object();
-            schema_obj
-                .extensions
-                .insert("nullable".to_owned(), json!(true));
+            schema_obj.extensions.insert("nullable".to_owned(), json!(true));
             schema = Schema::Object(schema_obj);
         };
         schema
@@ -79,23 +76,17 @@ impl<T: JsonSchema, E: JsonSchema> JsonSchema for Result<T, E> {
     }
 
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-        let mut ok_schema = SchemaObject {
-            instance_type: Some(InstanceType::Object.into()),
-            ..Default::default()
-        };
+        let mut ok_schema =
+            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
         let obj = ok_schema.object();
         obj.required.insert("Ok".to_owned());
-        obj.properties
-            .insert("Ok".to_owned(), generator.subschema_for::<T>());
+        obj.properties.insert("Ok".to_owned(), generator.subschema_for::<T>());
 
-        let mut err_schema = SchemaObject {
-            instance_type: Some(InstanceType::Object.into()),
-            ..Default::default()
-        };
+        let mut err_schema =
+            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
         let obj = err_schema.object();
         obj.required.insert("Err".to_owned());
-        obj.properties
-            .insert("Err".to_owned(), generator.subschema_for::<E>());
+        obj.properties.insert("Err".to_owned(), generator.subschema_for::<E>());
 
         let mut schema = SchemaObject::default();
         schema.subschemas().one_of = Some(vec![ok_schema.into(), err_schema.into()]);
@@ -113,23 +104,17 @@ impl<T: JsonSchema> JsonSchema for Bound<T> {
     }
 
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-        let mut included_schema = SchemaObject {
-            instance_type: Some(InstanceType::Object.into()),
-            ..Default::default()
-        };
+        let mut included_schema =
+            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
         let obj = included_schema.object();
         obj.required.insert("Included".to_owned());
-        obj.properties
-            .insert("Included".to_owned(), generator.subschema_for::<T>());
+        obj.properties.insert("Included".to_owned(), generator.subschema_for::<T>());
 
-        let mut excluded_schema = SchemaObject {
-            instance_type: Some(InstanceType::Object.into()),
-            ..Default::default()
-        };
+        let mut excluded_schema =
+            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
         let obj = excluded_schema.object();
         obj.required.insert("Excluded".to_owned());
-        obj.properties
-            .insert("Excluded".to_owned(), generator.subschema_for::<T>());
+        obj.properties.insert("Excluded".to_owned(), generator.subschema_for::<T>());
 
         let unbounded_schema = SchemaObject {
             instance_type: Some(InstanceType::String.into()),
@@ -138,11 +123,8 @@ impl<T: JsonSchema> JsonSchema for Bound<T> {
         };
 
         let mut schema = SchemaObject::default();
-        schema.subschemas().one_of = Some(vec![
-            included_schema.into(),
-            excluded_schema.into(),
-            unbounded_schema.into(),
-        ]);
+        schema.subschemas().one_of =
+            Some(vec![included_schema.into(), excluded_schema.into(), unbounded_schema.into()]);
         schema.into()
     }
 }
@@ -157,17 +139,13 @@ impl<T: JsonSchema> JsonSchema for Range<T> {
     }
 
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-        let mut schema = SchemaObject {
-            instance_type: Some(InstanceType::Object.into()),
-            ..Default::default()
-        };
+        let mut schema =
+            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
         let obj = schema.object();
         obj.required.insert("start".to_owned());
         obj.required.insert("end".to_owned());
-        obj.properties
-            .insert("start".to_owned(), generator.subschema_for::<T>());
-        obj.properties
-            .insert("end".to_owned(), generator.subschema_for::<T>());
+        obj.properties.insert("start".to_owned(), generator.subschema_for::<T>());
+        obj.properties.insert("end".to_owned(), generator.subschema_for::<T>());
         schema.into()
     }
 }

@@ -175,11 +175,7 @@ where
     T: Deserialize<'de> + Default + PartialEq,
 {
     let value = T::deserialize(deserializer)?;
-    if value == T::default() {
-        Ok(None)
-    } else {
-        Ok(Some(Box::new(value)))
-    }
+    if value == T::default() { Ok(None) } else { Ok(Some(Box::new(value))) }
 }
 
 macro_rules! get_or_insert_default_fn {
@@ -210,10 +206,7 @@ impl SchemaObject {
     /// The given reference string should be a URI reference. This will usually be a JSON Pointer
     /// in [URI Fragment representation](https://tools.ietf.org/html/rfc6901#section-6).
     pub fn new_ref(reference: String) -> Self {
-        SchemaObject {
-            reference: Some(reference),
-            ..Default::default()
-        }
+        SchemaObject { reference: Some(reference), ..Default::default() }
     }
 
     /// Returns `true` if `self` is a `$ref` schema.
@@ -230,9 +223,7 @@ impl SchemaObject {
     /// and does not check any subschemas. Because of this, both `{}` and  `{"not": {}}` accept any type according
     /// to this method.
     pub fn has_type(&self, ty: InstanceType) -> bool {
-        self.instance_type
-            .as_ref()
-            .map_or(true, |x| x.contains(&ty))
+        self.instance_type.as_ref().map_or(true, |x| x.contains(&ty))
     }
 
     get_or_insert_default_fn!(metadata, Metadata);
@@ -271,10 +262,7 @@ pub struct Metadata {
     /// The `default` keyword.
     ///
     /// See [JSON Schema Validation 9.2. "default"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-9.2).
-    #[serde(
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "allow_null"
-    )]
+    #[serde(skip_serializing_if = "Option::is_none", deserialize_with = "allow_null")]
     pub default: Option<Value>,
     /// The `deprecated` keyword.
     ///

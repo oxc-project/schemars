@@ -8,12 +8,7 @@ pub fn get_title_and_desc_from_doc(attrs: &[Attribute]) -> (Option<String>, Opti
 
     if doc.starts_with('#') {
         let mut split = doc.splitn(2, '\n');
-        let title = split
-            .next()
-            .unwrap()
-            .trim_start_matches('#')
-            .trim()
-            .to_owned();
+        let title = split.next().unwrap().trim_start_matches('#').trim().to_owned();
         let maybe_desc = split.next().and_then(merge_description_lines);
         (none_if_empty(title), maybe_desc)
     } else {
@@ -35,11 +30,7 @@ fn get_doc(attrs: &[Attribute]) -> Option<String> {
             }
 
             let meta = attr.meta.require_name_value().ok()?;
-            if let syn::Expr::Lit(syn::ExprLit {
-                lit: syn::Lit::Str(lit_str),
-                ..
-            }) = &meta.value
-            {
+            if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(lit_str), .. }) = &meta.value {
                 return Some(lit_str.value());
             }
 
@@ -73,9 +64,5 @@ fn get_doc(attrs: &[Attribute]) -> Option<String> {
 }
 
 fn none_if_empty(s: String) -> Option<String> {
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
-    }
+    if s.is_empty() { None } else { Some(s) }
 }

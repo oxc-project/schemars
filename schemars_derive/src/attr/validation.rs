@@ -3,12 +3,11 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use serde_derive_internals::Ctxt;
 use syn::{
-    parse::Parser, punctuated::Punctuated, Expr, ExprPath, Lit, Meta, MetaList, MetaNameValue, Path,
+    Expr, ExprPath, Lit, Meta, MetaList, MetaNameValue, Path, parse::Parser, punctuated::Punctuated,
 };
 
-pub(crate) static VALIDATION_KEYWORDS: &[&str] = &[
-    "range", "regex", "contains", "email", "phone", "url", "length", "required",
-];
+pub(crate) static VALIDATION_KEYWORDS: &[&str] =
+    &["range", "regex", "contains", "email", "phone", "url", "length", "required"];
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Format {
@@ -54,9 +53,12 @@ impl ValidationAttrs {
         let schemars_items = get_meta_items(attrs, "schemars", errors, false);
         let validate_items = get_meta_items(attrs, "validate", errors, true);
 
-        ValidationAttrs::default()
-            .populate(schemars_items, "schemars", false, errors)
-            .populate(validate_items, "validate", true, errors)
+        ValidationAttrs::default().populate(schemars_items, "schemars", false, errors).populate(
+            validate_items,
+            "validate",
+            true,
+            errors,
+        )
     }
 
     pub fn required(&self) -> bool {
@@ -72,10 +74,7 @@ impl ValidationAttrs {
     ) -> Self {
         let duplicate_error = |path: &Path| {
             if !ignore_errors {
-                let msg = format!(
-                    "duplicate schemars attribute `{}`",
-                    path.get_ident().unwrap()
-                );
+                let msg = format!("duplicate schemars attribute `{}`", path.get_ident().unwrap());
                 errors.error_spanned_by(path, msg)
             }
         };
@@ -447,13 +446,8 @@ fn parse_lit_into_expr_path(
     meta_item_name: &'static str,
     lit: &Expr,
 ) -> Result<Expr, ()> {
-    parse_lit_into_path(cx, attr_type, meta_item_name, lit).map(|path| {
-        Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path,
-        })
-    })
+    parse_lit_into_path(cx, attr_type, meta_item_name, lit)
+        .map(|path| Expr::Path(ExprPath { attrs: Vec::new(), qself: None, path }))
 }
 
 fn wrap_array_validation(v: Vec<TokenStream>) -> Option<TokenStream> {

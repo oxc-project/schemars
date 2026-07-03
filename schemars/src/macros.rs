@@ -71,8 +71,6 @@ macro_rules! schema_for {
 #[macro_export]
 macro_rules! schema_for_value {
     ($value:expr) => {
-        $crate::r#gen::SchemaGenerator::default()
-            .into_root_schema_for_value(&$value)
-            .unwrap()
+        $crate::r#gen::SchemaGenerator::default().into_root_schema_for_value(&$value).unwrap()
     };
 }

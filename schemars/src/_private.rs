@@ -12,10 +12,7 @@ pub fn json_schema_for_flatten<T: ?Sized + JsonSchema>(
     let mut schema = T::_schemars_private_non_optional_json_schema(generator);
 
     if T::_schemars_private_is_option() && !required {
-        if let Schema::Object(SchemaObject {
-            object: Some(ref mut object_validation),
-            ..
-        }) = schema
+        if let Schema::Object(SchemaObject { object: Some(ref mut object_validation), .. }) = schema
         {
             object_validation.required.clear();
         }

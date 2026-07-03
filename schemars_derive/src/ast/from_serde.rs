@@ -1,7 +1,7 @@
 use super::*;
 use crate::attr::Attrs;
-use serde_derive_internals::ast as serde_ast;
 use serde_derive_internals::Ctxt;
+use serde_derive_internals::ast as serde_ast;
 
 pub trait FromSerde: Sized {
     type SerdeType;

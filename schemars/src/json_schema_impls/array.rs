@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use std::borrow::Cow;
 
 // Does not require T: JsonSchema.
@@ -18,10 +18,7 @@ impl<T> JsonSchema for [T; 0] {
     fn json_schema(_: &mut SchemaGenerator) -> Schema {
         SchemaObject {
             instance_type: Some(InstanceType::Array.into()),
-            array: Some(Box::new(ArrayValidation {
-                max_items: Some(0),
-                ..Default::default()
-            })),
+            array: Some(Box::new(ArrayValidation { max_items: Some(0), ..Default::default() })),
             ..Default::default()
         }
         .into()
@@ -77,15 +74,9 @@ mod tests {
     #[test]
     fn schema_for_array() {
         let schema = schema_object_for::<[i32; 8]>();
-        assert_eq!(
-            schema.instance_type,
-            Some(SingleOrVec::from(InstanceType::Array))
-        );
+        assert_eq!(schema.instance_type, Some(SingleOrVec::from(InstanceType::Array)));
         let array_validation = schema.array.unwrap();
-        assert_eq!(
-            array_validation.items,
-            Some(SingleOrVec::from(schema_for::<i32>()))
-        );
+        assert_eq!(array_validation.items, Some(SingleOrVec::from(schema_for::<i32>())));
         assert_eq!(array_validation.max_items, Some(8));
         assert_eq!(array_validation.min_items, Some(8));
     }
@@ -96,10 +87,7 @@ mod tests {
     #[test]
     fn schema_for_empty_array() {
         let schema = schema_object_for::<[SomeStruct; 0]>();
-        assert_eq!(
-            schema.instance_type,
-            Some(SingleOrVec::from(InstanceType::Array))
-        );
+        assert_eq!(schema.instance_type, Some(SingleOrVec::from(InstanceType::Array)));
         let array_validation = schema.array.unwrap();
         assert_eq!(array_validation.max_items, Some(0));
     }

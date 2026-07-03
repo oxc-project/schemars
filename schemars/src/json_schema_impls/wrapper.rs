@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::Schema;
-use crate::JsonSchema;
 
 macro_rules! wrapper_impl {
     ($($desc:tt)+) => {

@@ -41,10 +41,8 @@ impl Attrs {
             .populate(attrs, "serde", true, errors);
 
         result.deprecated = attrs.iter().any(|a| a.path().is_ident("deprecated"));
-        result.repr = attrs
-            .iter()
-            .find(|a| a.path().is_ident("repr"))
-            .and_then(|a| a.parse_args().ok());
+        result.repr =
+            attrs.iter().find(|a| a.path().is_ident("repr")).and_then(|a| a.parse_args().ok());
 
         let (doc_title, doc_description) = doc::get_title_and_desc_from_doc(attrs);
         result.title = result.title.or(doc_title);
@@ -56,11 +54,7 @@ impl Attrs {
     pub fn as_metadata(&self) -> SchemaMetadata<'_> {
         #[allow(clippy::ptr_arg)]
         fn none_if_empty(s: &String) -> Option<&str> {
-            if s.is_empty() {
-                None
-            } else {
-                Some(s)
-            }
+            if s.is_empty() { None } else { Some(s) }
         }
 
         SchemaMetadata {
@@ -83,10 +77,8 @@ impl Attrs {
     ) -> Self {
         let duplicate_error = |meta: &MetaNameValue| {
             if !ignore_errors {
-                let msg = format!(
-                    "duplicate schemars attribute `{}`",
-                    meta.path.get_ident().unwrap()
-                );
+                let msg =
+                    format!("duplicate schemars attribute `{}`", meta.path.get_ident().unwrap());
                 errors.error_spanned_by(meta, msg)
             }
         };
@@ -172,11 +164,8 @@ impl Attrs {
 
                 _ => {
                     if !is_known_serde_or_validation_keyword(&meta_item) {
-                        let path = meta_item
-                            .path()
-                            .into_token_stream()
-                            .to_string()
-                            .replace(' ', "");
+                        let path =
+                            meta_item.path().into_token_stream().to_string().replace(' ', "");
                         errors.error_spanned_by(
                             meta_item.path(),
                             format!("unknown schemars attribute `{}`", path),
@@ -203,13 +192,9 @@ impl Attrs {
 }
 
 fn is_known_serde_or_validation_keyword(meta: &syn::Meta) -> bool {
-    let mut known_keywords = schemars_to_serde::SERDE_KEYWORDS
-        .iter()
-        .chain(validation::VALIDATION_KEYWORDS);
-    meta.path()
-        .get_ident()
-        .map(|i| known_keywords.any(|k| i == k))
-        .unwrap_or(false)
+    let mut known_keywords =
+        schemars_to_serde::SERDE_KEYWORDS.iter().chain(validation::VALIDATION_KEYWORDS);
+    meta.path().get_ident().map(|i| known_keywords.any(|k| i == k)).unwrap_or(false)
 }
 
 fn get_meta_items(
@@ -237,11 +222,7 @@ fn expr_as_lit_str<'a>(
     meta_item_name: &'static str,
     expr: &'a syn::Expr,
 ) -> Result<&'a syn::LitStr, ()> {
-    if let syn::Expr::Lit(syn::ExprLit {
-        lit: syn::Lit::Str(lit_str),
-        ..
-    }) = expr
-    {
+    if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(lit_str), .. }) = expr {
         Ok(lit_str)
     } else {
         cx.error_spanned_by(
@@ -266,11 +247,7 @@ fn parse_lit_into_ty(
     parse_lit_str(string).map_err(|_| {
         cx.error_spanned_by(
             lit,
-            format!(
-                "failed to parse type: `{} = {:?}`",
-                meta_item_name,
-                string.value()
-            ),
+            format!("failed to parse type: `{} = {:?}`", meta_item_name, string.value()),
         )
     })
 }
@@ -286,11 +263,7 @@ fn parse_lit_into_path(
     parse_lit_str(lit_str).map_err(|_| {
         cx.error_spanned_by(
             expr,
-            format!(
-                "failed to parse path: `{} = {:?}`",
-                meta_item_name,
-                lit_str.value()
-            ),
+            format!("failed to parse path: `{} = {:?}`", meta_item_name, lit_str.value()),
         )
     })
 }
@@ -309,10 +282,7 @@ fn spanned_tokens(s: &syn::LitStr) -> parse::Result<TokenStream> {
 }
 
 fn respan_token_stream(stream: TokenStream, span: Span) -> TokenStream {
-    stream
-        .into_iter()
-        .map(|token| respan_token_tree(token, span))
-        .collect()
+    stream.into_iter().map(|token| respan_token_tree(token, span)).collect()
 }
 
 fn respan_token_tree(mut token: TokenTree, span: Span) -> TokenTree {

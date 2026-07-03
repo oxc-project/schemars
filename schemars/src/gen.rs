@@ -8,7 +8,7 @@ There are two main types in this module:
 */
 
 use crate::schema::*;
-use crate::{visit::*, JsonSchema, Map};
+use crate::{JsonSchema, Map, visit::*};
 use dyn_clone::DynClone;
 use serde::Serialize;
 use std::borrow::Cow;
@@ -93,12 +93,8 @@ impl SchemaSettings {
             ),
             visitors: vec![
                 Box::new(RemoveRefSiblings),
-                Box::new(ReplaceBoolSchemas {
-                    skip_additional_properties: true,
-                }),
-                Box::new(SetSingleExample {
-                    retain_examples: false,
-                }),
+                Box::new(ReplaceBoolSchemas { skip_additional_properties: true }),
+                Box::new(SetSingleExample { retain_examples: false }),
             ],
             inline_subschemas: false,
         }
@@ -177,10 +173,7 @@ impl From<SchemaSettings> for SchemaGenerator {
 impl SchemaGenerator {
     /// Creates a new `SchemaGenerator` using the given settings.
     pub fn new(settings: SchemaSettings) -> SchemaGenerator {
-        SchemaGenerator {
-            settings,
-            ..Default::default()
-        }
+        SchemaGenerator { settings, ..Default::default() }
     }
 
     /// Borrows the [`SchemaSettings`] being used by this `SchemaGenerator`.
@@ -351,10 +344,7 @@ impl SchemaGenerator {
         value: &T,
     ) -> Result<RootSchema, serde_json::Error> {
         let mut schema = value
-            .serialize(crate::ser::Serializer {
-                generator: self,
-                include_title: true,
-            })?
+            .serialize(crate::ser::Serializer { generator: self, include_title: true })?
             .into_object();
 
         if let Ok(example) = serde_json::to_value(value) {
@@ -383,10 +373,7 @@ impl SchemaGenerator {
         value: &T,
     ) -> Result<RootSchema, serde_json::Error> {
         let mut schema = value
-            .serialize(crate::ser::Serializer {
-                generator: &mut self,
-                include_title: true,
-            })?
+            .serialize(crate::ser::Serializer { generator: &mut self, include_title: true })?
             .into_object();
 
         if let Ok(example) = serde_json::to_value(value) {
@@ -433,10 +420,7 @@ impl SchemaGenerator {
     /// ```
     pub fn dereference<'a>(&'a self, schema: &Schema) -> Option<&'a Schema> {
         match schema {
-            Schema::Object(SchemaObject {
-                reference: Some(ref schema_ref),
-                ..
-            }) => {
+            Schema::Object(SchemaObject { reference: Some(ref schema_ref), .. }) => {
                 let definitions_path = &self.settings().definitions_path;
                 if schema_ref.starts_with(definitions_path) {
                     let name = &schema_ref[definitions_path.len()..];
@@ -459,11 +443,7 @@ impl SchemaGenerator {
         impl<'a> PendingSchemaState<'a> {
             fn new(generator: &'a mut SchemaGenerator, id: Cow<'static, str>) -> Self {
                 let did_add = generator.pending_schema_ids.insert(id.clone());
-                Self {
-                    generator,
-                    id,
-                    did_add,
-                }
+                Self { generator, id, did_add }
             }
         }
 

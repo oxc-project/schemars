@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use indexmap2::{IndexMap, IndexSet};
 use std::collections::{HashMap, HashSet};
 

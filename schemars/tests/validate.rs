@@ -106,10 +106,7 @@ fn validate_schemars_attrs() -> TestResult {
 
 #[allow(dead_code)]
 #[derive(JsonSchema)]
-pub struct Tuple(
-    #[validate(range(max = 10))] u8,
-    #[validate(required)] Option<bool>,
-);
+pub struct Tuple(#[validate(range(max = 10))] u8, #[validate(required)] Option<bool>);
 
 #[test]
 fn validate_tuple() -> TestResult {

@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use std::borrow::Cow;
 
 macro_rules! tuple_impls {
@@ -72,17 +72,11 @@ mod tests {
     #[test]
     fn schema_for_map_any_value() {
         let schema = schema_object_for::<(i32, bool)>();
-        assert_eq!(
-            schema.instance_type,
-            Some(SingleOrVec::from(InstanceType::Array))
-        );
+        assert_eq!(schema.instance_type, Some(SingleOrVec::from(InstanceType::Array)));
         let array_validation = schema.array.unwrap();
         assert_eq!(
             array_validation.items,
-            Some(SingleOrVec::Vec(vec![
-                schema_for::<i32>(),
-                schema_for::<bool>()
-            ]))
+            Some(SingleOrVec::Vec(vec![schema_for::<i32>(), schema_for::<bool>()]))
         );
         assert_eq!(array_validation.max_items, Some(2));
         assert_eq!(array_validation.min_items, Some(2));

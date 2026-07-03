@@ -1,5 +1,5 @@
 use schemars::schema::{Schema, SchemaObject};
-use schemars::{r#gen::SchemaGenerator, schema_for, JsonSchema};
+use schemars::{JsonSchema, r#gen::SchemaGenerator, schema_for};
 use serde::{Deserialize, Serialize};
 
 // `int_as_string` and `bool_as_string` use the schema for `String`.
@@ -32,7 +32,7 @@ fn eight() -> i32 {
 
 // This module serializes values as strings
 mod as_string {
-    use serde::{de::Error, Deserialize, Deserializer, Serializer};
+    use serde::{Deserialize, Deserializer, Serializer, de::Error};
 
     pub fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -48,9 +48,7 @@ mod as_string {
         D: Deserializer<'de>,
     {
         let string = String::deserialize(deserializer)?;
-        string
-            .parse()
-            .map_err(|_| D::Error::custom("Input was not valid"))
+        string.parse().map_err(|_| D::Error::custom("Input was not valid"))
     }
 }
 
