@@ -17,10 +17,7 @@ pub enum External {
         foo: DoesntImplementJsonSchema,
     },
     NewType(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema),
-    Tuple(
-        #[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema,
-        i32,
-    ),
+    Tuple(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema, i32),
     #[schemars(schema_with = "schema_fn")]
     Unit,
 }
@@ -55,10 +52,7 @@ pub enum Untagged {
         foo: DoesntImplementJsonSchema,
     },
     NewType(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema),
-    Tuple(
-        #[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema,
-        i32,
-    ),
+    Tuple(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema, i32),
     #[schemars(schema_with = "schema_fn")]
     Unit,
 }
@@ -76,10 +70,7 @@ pub enum Adjacent {
         foo: DoesntImplementJsonSchema,
     },
     NewType(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema),
-    Tuple(
-        #[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema,
-        i32,
-    ),
+    Tuple(#[schemars(schema_with = "schema_fn")] DoesntImplementJsonSchema, i32),
     #[schemars(schema_with = "schema_fn")]
     Unit,
 }

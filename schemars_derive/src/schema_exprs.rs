@@ -25,10 +25,7 @@ pub fn expr_for_container(cont: &Container) -> TokenStream {
 
 pub fn expr_for_repr(cont: &Container) -> Result<TokenStream, syn::Error> {
     let repr_type = cont.attrs.repr.as_ref().ok_or_else(|| {
-        syn::Error::new(
-            Span::call_site(),
-            "JsonSchema_repr: missing #[repr(...)] attribute",
-        )
+        syn::Error::new(Span::call_site(), "JsonSchema_repr: missing #[repr(...)] attribute")
     })?;
 
     let variants = match &cont.data {
@@ -38,10 +35,7 @@ pub fn expr_for_repr(cont: &Container) -> Result<TokenStream, syn::Error> {
 
     if let Some(non_unit_error) = variants.iter().find_map(|v| match v.style {
         Style::Unit => None,
-        _ => Some(syn::Error::new(
-            v.original.span(),
-            "JsonSchema_repr: must be a unit variant",
-        )),
+        _ => Some(syn::Error::new(v.original.span(), "JsonSchema_repr: must be a unit variant")),
     }) {
         return Err(non_unit_error);
     };
@@ -131,9 +125,7 @@ fn type_for_schema(with_attr: &WithAttr) -> (syn::Type, Option<TokenStream>) {
 
 fn expr_for_enum(variants: &[Variant], cattrs: &serde_attr::Container) -> TokenStream {
     let deny_unknown_fields = cattrs.deny_unknown_fields();
-    let variants = variants
-        .iter()
-        .filter(|v| !v.serde_attrs.skip_deserializing());
+    let variants = variants.iter().filter(|v| !v.serde_attrs.skip_deserializing());
 
     match cattrs.tag() {
         TagType::External => expr_for_external_tagged_enum(variants, deny_unknown_fields),
@@ -188,10 +180,7 @@ fn expr_for_external_tagged_enum<'a>(
             }
         };
 
-        variant
-            .attrs
-            .as_metadata()
-            .apply_to_schema(&mut schema_expr);
+        variant.attrs.as_metadata().apply_to_schema(&mut schema_expr);
 
         schema_expr
     }));
@@ -240,10 +229,7 @@ fn expr_for_untagged_enum<'a>(
         .map(|variant| {
             let mut schema_expr = expr_for_untagged_enum_variant(variant, deny_unknown_fields);
 
-            variant
-                .attrs
-                .as_metadata()
-                .apply_to_schema(&mut schema_expr);
+            variant.attrs.as_metadata().apply_to_schema(&mut schema_expr);
 
             schema_expr
         })
@@ -318,10 +304,7 @@ fn expr_for_adjacent_tagged_enum<'a>(
                 })),
             });
 
-            variant
-                .attrs
-                .as_metadata()
-                .apply_to_schema(&mut outer_schema);
+            variant.attrs.as_metadata().apply_to_schema(&mut outer_schema);
 
             outer_schema
         })

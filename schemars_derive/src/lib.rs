@@ -19,17 +19,13 @@ use syn::spanned::Spanned;
 #[proc_macro_derive(JsonSchema, attributes(schemars, serde, validate))]
 pub fn derive_json_schema_wrapper(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);
-    derive_json_schema(input, false)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
+    derive_json_schema(input, false).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 #[proc_macro_derive(JsonSchema_repr, attributes(schemars, serde))]
 pub fn derive_json_schema_repr_wrapper(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);
-    derive_json_schema(input, true)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
+    derive_json_schema(input, true).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 fn derive_json_schema(mut input: syn::DeriveInput, repr: bool) -> syn::Result<TokenStream> {

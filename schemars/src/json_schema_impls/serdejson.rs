@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use serde_json::{Map, Number, Value};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
@@ -35,10 +35,7 @@ impl JsonSchema for Number {
     }
 
     fn json_schema(_: &mut SchemaGenerator) -> Schema {
-        SchemaObject {
-            instance_type: Some(InstanceType::Number.into()),
-            ..Default::default()
-        }
-        .into()
+        SchemaObject { instance_type: Some(InstanceType::Number.into()), ..Default::default() }
+            .into()
     }
 }

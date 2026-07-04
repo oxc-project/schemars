@@ -1,6 +1,6 @@
+use crate::JsonSchema;
 use crate::r#gen::SchemaGenerator;
 use crate::schema::*;
-use crate::JsonSchema;
 use std::sync::atomic::*;
 
 forward_impl!(AtomicBool => bool);

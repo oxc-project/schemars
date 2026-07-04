@@ -7,10 +7,7 @@ fn is_default<T: Default + PartialEq>(value: &T) -> bool {
 }
 
 fn ten_and_true() -> MyStruct2 {
-    MyStruct2 {
-        my_int: 10,
-        my_bool: true,
-    }
+    MyStruct2 { my_int: 10, my_bool: true }
 }
 
 fn six() -> i32 {
@@ -33,10 +30,7 @@ struct MyStruct {
     my_optional_string: Option<String>,
     #[serde(serialize_with = "custom_serialize")]
     my_struct2: MyStruct2,
-    #[serde(
-        serialize_with = "custom_serialize",
-        skip_serializing_if = "is_default"
-    )]
+    #[serde(serialize_with = "custom_serialize", skip_serializing_if = "is_default")]
     my_struct2_default_skipped: MyStruct2,
     not_serialize: NotSerialize,
 }
