@@ -6,20 +6,32 @@ use std::sync::atomic::*;
 forward_impl!(AtomicBool => bool);
 
 forward_impl!(AtomicI8 => i8);
+#[cfg(target_has_atomic = "16")]
 forward_impl!(AtomicI16 => i16);
+#[cfg(target_has_atomic = "32")]
 forward_impl!(AtomicI32 => i32);
-#[cfg(std_atomic64)]
+#[cfg(target_has_atomic = "64")]
 forward_impl!(AtomicI64 => i64);
+#[cfg(target_has_atomic = "ptr")]
 forward_impl!(AtomicIsize => isize);
 
 forward_impl!(AtomicU8 => u8);
+#[cfg(target_has_atomic = "16")]
 forward_impl!(AtomicU16 => u16);
+#[cfg(target_has_atomic = "32")]
 forward_impl!(AtomicU32 => u32);
-#[cfg(std_atomic64)]
+#[cfg(target_has_atomic = "64")]
 forward_impl!(AtomicU64 => u64);
+#[cfg(target_has_atomic = "ptr")]
 forward_impl!(AtomicUsize => usize);
 
-#[cfg(test)]
+#[cfg(all(
+    test,
+    target_has_atomic = "16",
+    target_has_atomic = "32",
+    target_has_atomic = "64",
+    target_has_atomic = "ptr"
+))]
 mod tests {
     use super::*;
     use crate::tests::schema_object_for;
