@@ -40,7 +40,7 @@ macro_rules! forward_impl {
 }
 
 mod array;
-#[cfg(std_atomic)]
+#[cfg(target_has_atomic = "8")]
 mod atomic;
 mod core;
 mod ffi;
