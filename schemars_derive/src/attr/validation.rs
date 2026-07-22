@@ -1,7 +1,7 @@
 use super::{expr_as_lit_str, get_meta_items, parse_lit_into_path, parse_lit_str};
+use crate::internals::Ctxt;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use serde_derive_internals::Ctxt;
 use syn::{
     Expr, ExprPath, Lit, Meta, MetaList, MetaNameValue, Path, parse::Parser, punctuated::Punctuated,
 };
