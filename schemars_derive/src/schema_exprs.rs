@@ -478,6 +478,10 @@ fn expr_for_struct(
                 schemars::_private::json_schema_for_flatten::<#ty>(#args)
             };
 
+            field
+                .attrs
+                .as_metadata()
+                .apply_to_additional_properties_schema(&mut schema_expr);
             prepend_type_def(type_def, &mut schema_expr);
             schema_expr
         })
