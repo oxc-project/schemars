@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.9.1...oxc-schemars-v0.9.2) - 2026-09-06
+
+### Other
+
+- *(schemars)* replace build.rs target sniffing with target_has_atomic cfgs ([#62](https://github.com/oxc-project/schemars/pull/62))
+- update sponsor section
+- standardize rustfmt config
+- normalize README sponsor section
+- configure clippy exported api lint ([#53](https://github.com/oxc-project/schemars/pull/53))
+
 ## [0.9.1](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.9.0...oxc-schemars-v0.9.1) - 2026-06-11
 
 ### Fixed
