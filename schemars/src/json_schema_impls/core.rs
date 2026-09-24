@@ -17,34 +17,8 @@ impl<T: JsonSchema> JsonSchema for Option<T> {
     }
 
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-        let mut schema = generator.subschema_for::<T>();
-        if generator.settings().option_add_null_type {
-            schema = match schema {
-                Schema::Bool(true) => Schema::Bool(true),
-                Schema::Bool(false) => <()>::json_schema(generator),
-                Schema::Object(SchemaObject {
-                    instance_type: Some(ref mut instance_type), ..
-                }) => {
-                    add_null_type(instance_type);
-                    schema
-                }
-                schema => SchemaObject {
-                    // TODO technically the schema already accepts null, so this may be unnecessary
-                    subschemas: Some(Box::new(SubschemaValidation {
-                        any_of: Some(vec![schema, <()>::json_schema(generator)]),
-                        ..Default::default()
-                    })),
-                    ..Default::default()
-                }
-                .into(),
-            }
-        }
-        if generator.settings().option_nullable {
-            let mut schema_obj = schema.into_object();
-            schema_obj.extensions.insert("nullable".to_owned(), json!(true));
-            schema = Schema::Object(schema_obj);
-        };
-        schema
+        let schema = generator.subschema_for::<T>();
+        option_json_schema(generator, schema)
     }
 
     fn _schemars_private_non_optional_json_schema(generator: &mut SchemaGenerator) -> Schema {
@@ -54,6 +28,36 @@ impl<T: JsonSchema> JsonSchema for Option<T> {
     fn _schemars_private_is_option() -> bool {
         true
     }
+}
+
+/// Non-generic body of `<Option<T> as JsonSchema>::json_schema`, so it is compiled once
+/// rather than once per `T` in every downstream crate.
+fn option_json_schema(generator: &mut SchemaGenerator, mut schema: Schema) -> Schema {
+    if generator.settings().option_add_null_type {
+        schema = match schema {
+            Schema::Bool(true) => Schema::Bool(true),
+            Schema::Bool(false) => <()>::json_schema(generator),
+            Schema::Object(SchemaObject { instance_type: Some(ref mut instance_type), .. }) => {
+                add_null_type(instance_type);
+                schema
+            }
+            schema => SchemaObject {
+                // TODO technically the schema already accepts null, so this may be unnecessary
+                subschemas: Some(Box::new(SubschemaValidation {
+                    any_of: Some(vec![schema, <()>::json_schema(generator)]),
+                    ..Default::default()
+                })),
+                ..Default::default()
+            }
+            .into(),
+        }
+    }
+    if generator.settings().option_nullable {
+        let mut schema_obj = schema.into_object();
+        schema_obj.extensions.insert("nullable".to_owned(), json!(true));
+        schema = Schema::Object(schema_obj);
+    };
+    schema
 }
 
 fn add_null_type(instance_type: &mut SingleOrVec<InstanceType>) {
