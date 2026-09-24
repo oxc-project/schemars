@@ -5,10 +5,10 @@ mod validation;
 pub use schemars_to_serde::process_serde_attrs;
 pub use validation::ValidationAttrs;
 
+use crate::internals::Ctxt;
 use crate::metadata::SchemaMetadata;
 use proc_macro2::{Group, Span, TokenStream, TokenTree};
 use quote::ToTokens;
-use serde_derive_internals::Ctxt;
 use syn::parse::{self, Parse};
 use syn::{Meta, MetaNameValue};
 

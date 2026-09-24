@@ -1,5 +1,5 @@
+use crate::internals::Ctxt;
 use quote::ToTokens;
-use serde_derive_internals::Ctxt;
 use std::collections::HashSet;
 use syn::parse::Parser;
 use syn::{Attribute, Data, Field, Meta, Variant};
