@@ -23,8 +23,11 @@ pub fn json_schema_for_flatten<T: ?Sized + JsonSchema>(
 
 /// Hack to simulate specialization:
 /// `MaybeSerializeWrapper(x).maybe_to_value()` will resolve to either
-/// - The inherent method `MaybeSerializeWrapper::maybe_to_value(...)` if x is `Serialize`
+/// - The inherent method `MaybeSerializeWrapper::maybe_to_value(...)` if x is `Option<impl Serialize>`
 /// - The trait method `NoSerialize::maybe_to_value(...)` from the blanket impl otherwise
+///
+/// The `Option` is unwrapped here rather than in derive-generated code so that each field with a
+/// default doesn't instantiate its own closure and `Option::and_then` in the downstream crate.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! _schemars_maybe_to_value {
@@ -36,7 +39,7 @@ macro_rules! _schemars_maybe_to_value {
     }};
 }
 
-pub struct MaybeSerializeWrapper<T>(pub T);
+pub struct MaybeSerializeWrapper<T>(pub Option<T>);
 
 pub trait NoSerialize: Sized {
     fn maybe_to_value(self) -> Option<Value> {
@@ -48,7 +51,7 @@ impl<T> NoSerialize for T {}
 
 impl<T: Serialize> MaybeSerializeWrapper<T> {
     pub fn maybe_to_value(self) -> Option<Value> {
-        serde_json::value::to_value(self.0).ok()
+        self.0.and_then(|value| serde_json::value::to_value(value).ok())
     }
 }
 
@@ -120,15 +123,16 @@ pub fn new_internally_tagged_enum(
     })
 }
 
-pub fn insert_object_property<T: ?Sized + JsonSchema>(
+pub fn insert_object_property(
     obj: &mut ObjectValidation,
     key: &str,
     has_default: bool,
     required: bool,
+    is_option: bool,
     schema: Schema,
 ) {
     obj.properties.insert(key.to_owned(), schema);
-    if !has_default && (required || !T::_schemars_private_is_option()) {
+    if !has_default && (required || !is_option) {
         obj.required.insert(key.to_owned());
     }
 }

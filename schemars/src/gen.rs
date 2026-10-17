@@ -212,15 +212,22 @@ impl SchemaGenerator {
     /// If `T`'s schema depends on any [referenceable](JsonSchema::is_referenceable) schemas, then this method will
     /// add them to the `SchemaGenerator`'s schema definitions.
     pub fn subschema_for<T: ?Sized + JsonSchema>(&mut self) -> Schema {
-        let id = T::schema_id();
-        let return_ref = T::is_referenceable()
-            && (!self.settings.inline_subschemas || self.pending_schema_ids.contains(&id));
+        self.subschema_for_inner(TypeInfo::of::<T>())
+    }
+
+    fn subschema_for_inner(&mut self, ty: TypeInfo) -> Schema {
+        if !ty.is_referenceable {
+            return self.json_schema_internal(ty, None);
+        }
+
+        let id = (ty.schema_id)();
+        let return_ref = !self.settings.inline_subschemas || self.pending_schema_ids.contains(&id);
 
         if return_ref {
             let name = match self.schema_id_to_name.get(&id).cloned() {
                 Some(n) => n,
                 None => {
-                    let base_name = T::schema_name();
+                    let base_name = (ty.schema_name)();
                     let mut name = String::new();
 
                     if self.used_schema_names.contains(&base_name) {
@@ -242,24 +249,20 @@ impl SchemaGenerator {
 
             let reference = format!("{}{}", self.settings.definitions_path, name);
             if !self.definitions.contains_key(&name) {
-                self.insert_new_subschema_for::<T>(name, id);
+                self.insert_new_subschema_for(name, ty, id);
             }
             Schema::new_ref(reference)
         } else {
-            self.json_schema_internal::<T>(id)
+            self.json_schema_internal(ty, Some(id))
         }
     }
 
-    fn insert_new_subschema_for<T: ?Sized + JsonSchema>(
-        &mut self,
-        name: String,
-        id: Cow<'static, str>,
-    ) {
+    fn insert_new_subschema_for(&mut self, name: String, ty: TypeInfo, id: Cow<'static, str>) {
         let dummy = Schema::Bool(false);
         // insert into definitions BEFORE calling json_schema to avoid infinite recursion
         self.definitions.insert(name.clone(), dummy);
 
-        let schema = self.json_schema_internal::<T>(id);
+        let schema = self.json_schema_internal(ty, Some(id));
 
         self.definitions.insert(name, schema);
     }
@@ -300,8 +303,11 @@ impl SchemaGenerator {
     /// add them to the `SchemaGenerator`'s schema definitions and include them in the returned `SchemaObject`'s
     /// [`definitions`](../schema/struct.Metadata.html#structfield.definitions)
     pub fn root_schema_for<T: ?Sized + JsonSchema>(&mut self) -> RootSchema {
-        let mut schema = self.json_schema_internal::<T>(T::schema_id()).into_object();
-        schema.metadata().title.get_or_insert_with(T::schema_name);
+        self.root_schema_for_inner(TypeInfo::of::<T>())
+    }
+
+    fn root_schema_for_inner(&mut self, ty: TypeInfo) -> RootSchema {
+        let schema = self.root_schema_object_for(ty);
         let mut root = RootSchema {
             meta_schema: self.settings.meta_schema.clone(),
             definitions: self.definitions.clone(),
@@ -319,9 +325,12 @@ impl SchemaGenerator {
     ///
     /// If `T`'s schema depends on any [referenceable](JsonSchema::is_referenceable) schemas, then this method will
     /// include them in the returned `SchemaObject`'s [`definitions`](../schema/struct.Metadata.html#structfield.definitions)
-    pub fn into_root_schema_for<T: ?Sized + JsonSchema>(mut self) -> RootSchema {
-        let mut schema = self.json_schema_internal::<T>(T::schema_id()).into_object();
-        schema.metadata().title.get_or_insert_with(T::schema_name);
+    pub fn into_root_schema_for<T: ?Sized + JsonSchema>(self) -> RootSchema {
+        self.into_root_schema_for_inner(TypeInfo::of::<T>())
+    }
+
+    fn into_root_schema_for_inner(mut self, ty: TypeInfo) -> RootSchema {
+        let schema = self.root_schema_object_for(ty);
         let mut root = RootSchema {
             meta_schema: self.settings.meta_schema,
             definitions: self.definitions,
@@ -333,6 +342,12 @@ impl SchemaGenerator {
         }
 
         root
+    }
+
+    fn root_schema_object_for(&mut self, ty: TypeInfo) -> SchemaObject {
+        let mut schema = self.json_schema_internal(ty, None).into_object();
+        schema.metadata().title.get_or_insert_with(ty.schema_name);
+        schema
     }
 
     /// Generates a root JSON Schema for the given example value.
@@ -433,7 +448,13 @@ impl SchemaGenerator {
         }
     }
 
-    fn json_schema_internal<T: ?Sized + JsonSchema>(&mut self, id: Cow<'static, str>) -> Schema {
+    /// `id` is `T::schema_id()` if the caller has already computed it, so it is not computed twice.
+    fn json_schema_internal(&mut self, ty: TypeInfo, id: Option<Cow<'static, str>>) -> Schema {
+        if !self.settings.inline_subschemas {
+            // `pending_schema_ids` is only consulted when inlining subschemas.
+            return (ty.json_schema)(self);
+        }
+
         struct PendingSchemaState<'a> {
             generator: &'a mut SchemaGenerator,
             id: Cow<'static, str>,
@@ -455,8 +476,33 @@ impl SchemaGenerator {
             }
         }
 
-        let pss = PendingSchemaState::new(self, id);
-        T::json_schema(pss.generator)
+        let pss = PendingSchemaState::new(self, id.unwrap_or_else(ty.schema_id));
+        (ty.json_schema)(pss.generator)
+    }
+}
+
+/// The `JsonSchema` trait functions of one type, as plain function pointers.
+///
+/// The generic `SchemaGenerator` methods are monomorphized per type in every downstream crate.
+/// Passing this instead of `T` keeps each copy to a few instructions and compiles the real
+/// logic once, here.
+#[derive(Clone, Copy)]
+struct TypeInfo {
+    is_referenceable: bool,
+    schema_id: fn() -> Cow<'static, str>,
+    schema_name: fn() -> String,
+    json_schema: fn(&mut SchemaGenerator) -> Schema,
+}
+
+impl TypeInfo {
+    #[inline]
+    fn of<T: ?Sized + JsonSchema>() -> Self {
+        TypeInfo {
+            is_referenceable: T::is_referenceable(),
+            schema_id: T::schema_id,
+            schema_name: T::schema_name,
+            json_schema: T::json_schema,
+        }
     }
 }
 

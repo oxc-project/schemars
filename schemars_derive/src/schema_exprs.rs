@@ -460,7 +460,7 @@ fn expr_for_struct(
             quote! {
                 {
                     #type_def
-                    schemars::_private::insert_object_property::<#ty>(object_validation, #name, #has_default, #required, #schema_expr);
+                    schemars::_private::insert_object_property(object_validation, #name, #has_default, #required, <#ty as schemars::JsonSchema>::_schemars_private_is_option(), #schema_expr);
                 }
             }
         })

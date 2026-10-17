@@ -55,7 +55,7 @@ impl<'a> SchemaMetadata<'a> {
 
         if let Some(default) = &self.default {
             *schema_expr = quote! {
-                schemars::_private::metadata::add_default(#schema_expr, #default.and_then(|d| schemars::_schemars_maybe_to_value!(d)))
+                schemars::_private::metadata::add_default(#schema_expr, schemars::_schemars_maybe_to_value!(#default))
             };
         }
     }
