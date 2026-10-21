@@ -59,4 +59,12 @@ impl<'a> SchemaMetadata<'a> {
             };
         }
     }
+
+    pub fn apply_to_additional_properties_schema(&self, schema_expr: &mut TokenStream) {
+        if let Some(description) = &self.description {
+            *schema_expr = quote! {
+                schemars::_private::metadata::add_description_to_additional_properties(#schema_expr, #description)
+            };
+        }
+    }
 }

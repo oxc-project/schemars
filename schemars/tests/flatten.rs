@@ -52,6 +52,7 @@ struct Deep4 {
 #[allow(dead_code)]
 #[derive(JsonSchema)]
 struct FlattenedMap {
+    /// Additional flattened values.
     #[serde(flatten)]
     extra: BTreeMap<String, Vec<String>>,
 }

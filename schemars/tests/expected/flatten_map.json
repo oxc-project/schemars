@@ -3,6 +3,7 @@
   "title": "FlattenedMap",
   "type": "object",
   "additionalProperties": {
+    "description": "Additional flattened values.",
     "type": "array",
     "items": {
       "type": "string"
