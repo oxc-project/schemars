@@ -1,13 +1,13 @@
 mod from_serde;
 
 use crate::attr::{Attrs, ValidationAttrs};
+use crate::internals::ast as serde_ast;
+use crate::internals::{Ctxt, Derive};
 use from_serde::FromSerde;
-use serde_derive_internals::ast as serde_ast;
-use serde_derive_internals::{Ctxt, Derive};
 
 pub struct Container<'a> {
     pub ident: syn::Ident,
-    pub serde_attrs: serde_derive_internals::attr::Container,
+    pub serde_attrs: crate::internals::attr::Container,
     pub data: Data<'a>,
     pub generics: syn::Generics,
     #[allow(dead_code)]
@@ -22,7 +22,7 @@ pub enum Data<'a> {
 
 pub struct Variant<'a> {
     pub ident: syn::Ident,
-    pub serde_attrs: serde_derive_internals::attr::Variant,
+    pub serde_attrs: crate::internals::attr::Variant,
     pub style: serde_ast::Style,
     pub fields: Vec<Field<'a>>,
     pub original: &'a syn::Variant,
@@ -31,7 +31,7 @@ pub struct Variant<'a> {
 
 pub struct Field<'a> {
     pub member: syn::Member,
-    pub serde_attrs: serde_derive_internals::attr::Field,
+    pub serde_attrs: crate::internals::attr::Field,
     pub ty: &'a syn::Type,
     pub original: &'a syn::Field,
     pub attrs: Attrs,
