@@ -17,13 +17,13 @@ name = "schemars"
 [dependencies]
 oxc_schemars_derive = { workspace = true, optional = true }
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.143"
+serde_json = "1.0.154"
 dyn-clone = "1.0"
 
-indexmap2 = { version = "2.0", features = [
+indexmap2 = { version = "2.14", features = [
     "serde",
 ], optional = true, package = "indexmap" }
-regex = { version = "1.12", optional = true }
+regex = { version = "1.13", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"

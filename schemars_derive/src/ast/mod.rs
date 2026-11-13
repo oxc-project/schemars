@@ -41,7 +41,9 @@ pub struct Field<'a> {
 impl<'a> Container<'a> {
     pub fn from_ast(item: &'a syn::DeriveInput) -> syn::Result<Container<'a>> {
         let ctxt = Ctxt::new();
-        let result = serde_ast::Container::from_ast(&ctxt, item, Derive::Deserialize)
+        // Schema generation does not emit Serde's private paths.
+        let private = parse_quote!(__private);
+        let result = serde_ast::Container::from_ast(&ctxt, item, Derive::Deserialize, &private)
             .ok_or(())
             .and_then(|serde| Self::from_serde(&ctxt, serde));
 
@@ -50,7 +52,7 @@ impl<'a> Container<'a> {
     }
 
     pub fn name(&self) -> &str {
-        self.serde_attrs.name().deserialize_name()
+        &self.serde_attrs.name().deserialize_name().value
     }
 
     pub fn transparent_field(&'a self) -> Option<&'a Field<'a>> {
@@ -66,7 +68,7 @@ impl<'a> Container<'a> {
 
 impl<'a> Variant<'a> {
     pub fn name(&self) -> &str {
-        self.serde_attrs.name().deserialize_name()
+        &self.serde_attrs.name().deserialize_name().value
     }
 
     pub fn is_unit(&self) -> bool {
@@ -76,6 +78,6 @@ impl<'a> Variant<'a> {
 
 impl<'a> Field<'a> {
     pub fn name(&self) -> &str {
-        self.serde_attrs.name().deserialize_name()
+        &self.serde_attrs.name().deserialize_name().value
     }
 }
