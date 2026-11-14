@@ -486,23 +486,16 @@ fn expr_for_struct(
                     }
                 }
             } else {
+                // Metadata must be applied before validation: validation only modifies
+                // `Schema::Object`, and metadata turns e.g. a `Schema::Bool` into an object.
                 let mut schema_expr = quote!(#schema_fn(generator));
-                SchemaMetadata {
-                    title: None,
-                    description: None,
-                    deprecated: false,
-                    read_only: false,
-                    write_only: false,
-                    examples: metadata.examples,
-                    default: None,
-                }
-                .apply_to_schema(&mut schema_expr);
+                metadata.apply_to_schema(&mut schema_expr);
                 field.validation_attrs.apply_to_schema(&mut schema_expr);
 
                 quote! {
                     {
                         #type_def
-                        schemars::_private::insert_property(object_validation, #schema_expr, #is_option, #property_meta, #default);
+                        schemars::_private::insert_object_property(object_validation, #name, #has_default, #required, #is_option, #schema_expr);
                     }
                 }
             }

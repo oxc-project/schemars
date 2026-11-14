@@ -121,3 +121,21 @@ pub struct NewType(#[validate(range(max = 10))] u8);
 fn validate_newtype() -> TestResult {
     test_default_generated_schema::<NewType>("validate_newtype")
 }
+
+#[allow(dead_code)]
+#[derive(JsonSchema)]
+pub struct DocumentedValue {
+    /// A documented field whose type's schema is `true`.
+    #[schemars(email)]
+    value: serde_json::Value,
+}
+
+/// Field metadata must be applied before validation: validation only modifies object schemas,
+/// and the description is what turns `Value`'s `true` schema into an object.
+#[test]
+fn validate_documented_bool_schema() {
+    let schema = serde_json::to_value(schemars::schema_for!(DocumentedValue)).unwrap();
+    let value = &schema["properties"]["value"];
+    assert_eq!(value["format"], "email");
+    assert_eq!(value["description"], "A documented field whose type's schema is `true`.");
+}
