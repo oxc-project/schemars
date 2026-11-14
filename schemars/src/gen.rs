@@ -448,7 +448,7 @@ impl SchemaGenerator {
         }
     }
 
-    /// `id` is `T::schema_id()` if the caller has already computed it, so it is not computed twice.
+    /// `id` is `(ty.schema_id)()` if the caller has already computed it, so it is not computed twice.
     fn json_schema_internal(&mut self, ty: TypeInfo, id: Option<Cow<'static, str>>) -> Schema {
         if !self.settings.inline_subschemas {
             // `pending_schema_ids` is only consulted when inlining subschemas.
