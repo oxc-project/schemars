@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.9.1...oxc-schemars-v0.9.2) - 2026-11-14
+
+### Other
+
+- *(oxc-schemars)* exclude extraneous files from published packages ([#66](https://github.com/oxc-project/schemars/pull/66))
+- emit non-generic helper calls from derive and std impls ([#86](https://github.com/oxc-project/schemars/pull/86))
+- compile generic SchemaGenerator/derive helpers once instead of per type ([#77](https://github.com/oxc-project/schemars/pull/77))
+- *(deps)* upgrade remaining Cargo dependencies ([#85](https://github.com/oxc-project/schemars/pull/85))
+- *(deps)* upgrade Cargo dependencies ([#83](https://github.com/oxc-project/schemars/pull/83))
+- *(schemars)* replace build.rs target sniffing with target_has_atomic cfgs ([#62](https://github.com/oxc-project/schemars/pull/62))
+- update sponsor section
+- standardize rustfmt config
+- normalize README sponsor section
+- configure clippy exported api lint ([#53](https://github.com/oxc-project/schemars/pull/53))
+
 ## [0.9.1](https://github.com/oxc-project/schemars/compare/oxc-schemars-v0.9.0...oxc-schemars-v0.9.1) - 2026-06-11
 
 ### Fixed
