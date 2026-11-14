@@ -65,6 +65,11 @@ impl ValidationAttrs {
         self.required
     }
 
+    /// Whether `apply_to_schema` would leave the schema expression unchanged.
+    pub fn is_empty(&self) -> bool {
+        self.apply_to_schema_expr().is_none()
+    }
+
     fn populate(
         mut self,
         meta_items: Vec<Meta>,
