@@ -9,11 +9,11 @@ impl<T: JsonSchema> JsonSchema for Option<T> {
     no_ref_schema!();
 
     fn schema_name() -> String {
-        format!("Nullable_{}", T::schema_name())
+        super::concat_name("Nullable_", T::schema_name())
     }
 
     fn schema_id() -> Cow<'static, str> {
-        Cow::Owned(format!("Option<{}>", T::schema_id()))
+        super::wrap_id("Option<", T::schema_id(), ">")
     }
 
     fn json_schema(generator: &mut SchemaGenerator) -> Schema {

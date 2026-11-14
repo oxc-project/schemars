@@ -39,6 +39,28 @@ macro_rules! forward_impl {
     };
 }
 
+/// `prefix` followed by `name`; a non-generic replacement for `format!("{prefix}{name}")`
+/// in generic `schema_name` impls.
+fn concat_name(prefix: &str, name: String) -> String {
+    let mut s = String::with_capacity(prefix.len() + name.len());
+    s.push_str(prefix);
+    s.push_str(&name);
+    s
+}
+
+/// `prefix`, `id`, `suffix`; a non-generic replacement for `format!` in generic `schema_id` impls.
+fn wrap_id(
+    prefix: &str,
+    id: std::borrow::Cow<'static, str>,
+    suffix: &str,
+) -> std::borrow::Cow<'static, str> {
+    let mut s = String::with_capacity(prefix.len() + id.len() + suffix.len());
+    s.push_str(prefix);
+    s.push_str(&id);
+    s.push_str(suffix);
+    std::borrow::Cow::Owned(s)
+}
+
 mod array;
 #[cfg(target_has_atomic = "8")]
 mod atomic;

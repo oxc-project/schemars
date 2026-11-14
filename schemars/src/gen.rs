@@ -212,7 +212,14 @@ impl SchemaGenerator {
     /// If `T`'s schema depends on any [referenceable](JsonSchema::is_referenceable) schemas, then this method will
     /// add them to the `SchemaGenerator`'s schema definitions.
     pub fn subschema_for<T: ?Sized + JsonSchema>(&mut self) -> Schema {
-        self.subschema_for_inner(TypeInfo::of::<T>())
+        // `TypeInfo` is built here rather than with `TypeInfo::of` so that each `T` instantiates
+        // one function instead of two (`#[inline]` does nothing in unoptimized builds).
+        self.subschema_for_inner(TypeInfo {
+            is_referenceable: T::is_referenceable(),
+            schema_id: T::schema_id,
+            schema_name: T::schema_name,
+            json_schema: T::json_schema,
+        })
     }
 
     fn subschema_for_inner(&mut self, ty: TypeInfo) -> Schema {

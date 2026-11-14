@@ -12,24 +12,15 @@ macro_rules! seq_impl {
             no_ref_schema!();
 
             fn schema_name() -> String {
-                format!("Array_of_{}", T::schema_name())
+                super::concat_name("Array_of_", T::schema_name())
             }
 
             fn schema_id() -> Cow<'static, str> {
-                Cow::Owned(
-                    format!("[{}]", T::schema_id()))
+                super::wrap_id("[", T::schema_id(), "]")
             }
 
             fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-                SchemaObject {
-                    instance_type: Some(InstanceType::Array.into()),
-                    array: Some(Box::new(ArrayValidation {
-                        items: Some(generator.subschema_for::<T>().into()),
-                        ..Default::default()
-                    })),
-                    ..Default::default()
-                }
-                .into()
+                array_schema(generator.subschema_for::<T>(), false)
             }
         }
     };
@@ -44,28 +35,33 @@ macro_rules! set_impl {
             no_ref_schema!();
 
             fn schema_name() -> String {
-                format!("Set_of_{}", T::schema_name())
+                super::concat_name("Set_of_", T::schema_name())
             }
 
             fn schema_id() -> Cow<'static, str> {
-                Cow::Owned(
-                    format!("Set<{}>", T::schema_id()))
+                super::wrap_id("Set<", T::schema_id(), ">")
             }
 
             fn json_schema(generator: &mut SchemaGenerator) -> Schema {
-                SchemaObject {
-                    instance_type: Some(InstanceType::Array.into()),
-                    array: Some(Box::new(ArrayValidation {
-                        unique_items: Some(true),
-                        items: Some(generator.subschema_for::<T>().into()),
-                        ..Default::default()
-                    })),
-                    ..Default::default()
-                }
-                .into()
+                array_schema(generator.subschema_for::<T>(), true)
             }
         }
     };
+}
+
+/// Non-generic body shared by every sequence and set `json_schema`, so it is compiled once
+/// rather than once per element type in every downstream crate.
+fn array_schema(items: Schema, unique_items: bool) -> Schema {
+    SchemaObject {
+        instance_type: Some(InstanceType::Array.into()),
+        array: Some(Box::new(ArrayValidation {
+            unique_items: if unique_items { Some(true) } else { None },
+            items: Some(items.into()),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into()
 }
 
 seq_impl!(<T> JsonSchema for std::collections::BinaryHeap<T>);

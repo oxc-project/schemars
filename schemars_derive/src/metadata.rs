@@ -13,34 +13,6 @@ pub struct SchemaMetadata<'a> {
 
 impl<'a> SchemaMetadata<'a> {
     pub fn apply_to_schema(&self, schema_expr: &mut TokenStream) {
-        if let Some(title) = &self.title {
-            *schema_expr = quote! {
-                schemars::_private::metadata::add_title(#schema_expr, #title)
-            };
-        }
-        if let Some(description) = &self.description {
-            *schema_expr = quote! {
-                schemars::_private::metadata::add_description(#schema_expr, #description)
-            };
-        }
-
-        if self.deprecated {
-            *schema_expr = quote! {
-                schemars::_private::metadata::add_deprecated(#schema_expr, true)
-            };
-        }
-
-        if self.read_only {
-            *schema_expr = quote! {
-                schemars::_private::metadata::add_read_only(#schema_expr, true)
-            };
-        }
-        if self.write_only {
-            *schema_expr = quote! {
-                schemars::_private::metadata::add_write_only(#schema_expr, true)
-            };
-        }
-
         if !self.examples.is_empty() {
             let examples = self.examples.iter().map(|eg| {
                 quote! {
@@ -53,10 +25,54 @@ impl<'a> SchemaMetadata<'a> {
             };
         }
 
-        if let Some(default) = &self.default {
+        if self.has_static_metadata() || self.default.is_some() {
+            let metadata = self.static_metadata();
+            let default = self.default_value_expr();
             *schema_expr = quote! {
-                schemars::_private::metadata::add_default(#schema_expr, schemars::_schemars_maybe_to_value!(#default))
+                schemars::_private::metadata::apply(#schema_expr, &#metadata, #default)
             };
+        }
+    }
+
+    /// Whether any metadata other than `examples` and `default` is set.
+    pub fn has_static_metadata(&self) -> bool {
+        self.title.is_some()
+            || self.description.is_some()
+            || self.deprecated
+            || self.read_only
+            || self.write_only
+    }
+
+    /// A constant `schemars::_private::metadata::Metadata` expression, which the compiler
+    /// promotes to a `&'static` when borrowed.
+    pub fn static_metadata(&self) -> TokenStream {
+        fn opt_str(s: Option<&str>) -> TokenStream {
+            match s {
+                Some(s) => quote!(Some(#s)),
+                None => quote!(None),
+            }
+        }
+        let title = opt_str(self.title);
+        let description = opt_str(self.description);
+        let deprecated = self.deprecated;
+        let read_only = self.read_only;
+        let write_only = self.write_only;
+        quote! {
+            schemars::_private::metadata::Metadata {
+                title: #title,
+                description: #description,
+                deprecated: #deprecated,
+                read_only: #read_only,
+                write_only: #write_only,
+            }
+        }
+    }
+
+    /// An `Option<serde_json::Value>` expression for the `default` keyword.
+    pub fn default_value_expr(&self) -> TokenStream {
+        match &self.default {
+            Some(default) => quote!(schemars::_schemars_maybe_to_value!(#default)),
+            None => quote!(None),
         }
     }
 }

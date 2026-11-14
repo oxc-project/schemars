@@ -51,3 +51,36 @@ struct NotSerialize;
 fn schema_default_values() -> TestResult {
     test_default_generated_schema::<MyStruct>("default")
 }
+
+fn ten_and_false() -> MyStruct2 {
+    MyStruct2 { my_int: 10, my_bool: false }
+}
+
+/// Field-level defaults (not taken from the container default) combined with
+/// `skip_serializing_if` and `serialize_with`.
+#[allow(dead_code)]
+#[derive(JsonSchema)]
+struct FieldDefaults {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    skipped_none: Option<String>,
+    #[serde(default = "six", skip_serializing_if = "is_default")]
+    kept_six: i32,
+    #[serde(default = "ten_and_false", serialize_with = "custom_serialize")]
+    custom: MyStruct2,
+    #[serde(
+        default = "ten_and_false",
+        serialize_with = "custom_serialize",
+        skip_serializing_if = "is_default"
+    )]
+    custom_skip_if: MyStruct2,
+}
+
+#[test]
+fn schema_field_default_values() {
+    let schema = serde_json::to_value(schemars::schema_for!(FieldDefaults)).unwrap();
+    let props = &schema["properties"];
+    assert_eq!(props["skipped_none"].get("default"), None);
+    assert_eq!(props["kept_six"]["default"], 6);
+    assert_eq!(props["custom"]["default"], "i:10 b:false");
+    assert_eq!(props["custom_skip_if"]["default"], "i:10 b:false");
+}
